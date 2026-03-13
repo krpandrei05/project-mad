@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ══════════════════════════════════════════════════════════
+         AirBus Quest — Spacing & Dimension System
+         Based on 8dp grid. Every spacing is a multiple of 8dp
+         for visual rhythm and consistency.
+         ══════════════════════════════════════════════════════════ -->
+
+    <!-- Base spacing unit: 8dp -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <!-- Screen margins (content padding from screen edges) -->
+    <dimen name="screen_margin">16dp</dimen>
+
+    <!-- Card dimensions -->
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+
+    <!-- Button dimensions -->
+    <dimen name="button_corner_radius">24dp</dimen>
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="button_padding_vertical">12dp</dimen>
+
+    <!-- Avatar dimensions -->
+    <dimen name="avatar_large">200dp</dimen>      <!-- Dashboard main avatar -->
+    <dimen name="avatar_medium">80dp</dimen>       <!-- Main menu card, create character -->
+    <dimen name="avatar_small">56dp</dimen>        <!-- History list, drawer header -->
+    <dimen name="avatar_selection">120dp</dimen>   <!-- Avatar selection cards -->
+
+    <!-- AQI circle on dashboard -->
+    <dimen name="aqi_circle_size">64dp</dimen>
+
+    <!-- HP bar -->
+    <dimen name="hp_bar_height">12dp</dimen>
+    <dimen name="hp_bar_corner">6dp</dimen>
+
+    <!-- Bottom Navigation -->
+    <dimen name="bottom_nav_top_line">1dp</dimen>
+
+    <!-- Recommendation card accent line (left border) -->
+    <dimen name="recommendation_accent_width">4dp</dimen>
+
+    <!-- Photo area in Report screen -->
+    <dimen name="photo_area_height">200dp</dimen>
+
+    <!-- Map legend -->
+    <dimen name="legend_dot_size">12dp</dimen>
+
+    <!-- Toolbar height -->
+    <dimen name="toolbar_height">56dp</dimen>
+
+    <!-- Drawer header height -->
+    <dimen name="drawer_header_height">180dp</dimen>
+
+    <!-- Character status badge -->
+    <dimen name="badge_corner_radius">12dp</dimen>
+    <dimen name="badge_padding_horizontal">12dp</dimen>
+    <dimen name="badge_padding_vertical">4dp</dimen>
+
+</resources>

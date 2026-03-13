@@ -1,5 +1,76 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!--  ══════════════════════════════════════════════════════════
+             AirBus Quest — Color Palette
+             Hybrid theme: dark header/navbar + light content area
+             ══════════════════════════════════════════════════════════  -->
+    <!--  PRIMARY: Forest Night — used for Toolbar, Bottom Nav, Drawer header  -->
+    <color name="primary">#1B2E1B</color>
+    <color name="primary_variant">#0F1E0F</color>
+    <color name="on_primary">#FFFFFF</color>
+    <!--  SECONDARY / ACCENT: Vibrant Green — buttons, active icons, highlights  -->
+    <color name="accent">#4CAF50</color>
+    <color name="accent_dark">#388E3C</color>
+    <color name="accent_light">#81C784</color>
+    <color name="on_accent">#FFFFFF</color>
+    <!--  BACKGROUND: Warm white with very subtle green tint  -->
+    <color name="background">#F5F7F2</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_elevated">#FFFFFF</color>
+    <!--  TEXT on light backgrounds  -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_disabled">#9E9E9E</color>
+    <!--  TEXT on dark backgrounds (toolbar, nav bar, drawer header)  -->
+    <color name="text_on_dark">#FFFFFF</color>
+    <color name="text_on_dark_secondary">#99FFFFFF</color>
+    <!--  60% white  -->
+    <!--  ═══ AQI COLOR SYSTEM ═══
+             These 4 colors appear EVERYWHERE: HP bar, map markers,
+             recommendation cards, AQI circle on dashboard.
+             Keep them CONSISTENT across the entire app.  -->
+    <color name="aqi_good">#4CAF50</color>
+    <!--  AQI 1: Green  -->
+    <color name="aqi_moderate">#FFC107</color>
+    <!--  AQI 2-3: Amber  -->
+    <color name="aqi_unhealthy">#FF9800</color>
+    <!--  AQI 4: Orange  -->
+    <color name="aqi_hazardous">#F44336</color>
+    <!--  AQI 5: Red  -->
+    <color name="aqi_unknown">#9E9E9E</color>
+    <!--  No data: Grey  -->
+    <!--  AQI backgrounds (lighter versions for cards/badges)  -->
+    <color name="aqi_good_bg">#E8F5E9</color>
+    <color name="aqi_moderate_bg">#FFF8E1</color>
+    <color name="aqi_unhealthy_bg">#FFF3E0</color>
+    <color name="aqi_hazardous_bg">#FFEBEE</color>
+    <!--  HP bar gradient thresholds  -->
+    <color name="hp_excellent">#4CAF50</color>
+    <!--  > 60 HP  -->
+    <color name="hp_warning">#FFC107</color>
+    <!--  30–60 HP  -->
+    <color name="hp_critical">#F44336</color>
+    <!--  < 30 HP  -->
+    <!--  UI elements  -->
+    <color name="divider">#E0E0E0</color>
+    <color name="card_shadow">#1A000000</color>
+    <!--  10% black  -->
+    <color name="ripple_light">#1A4CAF50</color>
+    <!--  10% green ripple  -->
+    <color name="ripple_dark">#33FFFFFF</color>
+    <!--  20% white ripple  -->
+    <color name="input_stroke">#BDBDBD</color>
+    <color name="input_stroke_focused">#4CAF50</color>
+    <!--  Bottom Nav specific  -->
+    <color name="bottom_nav_bg">#1B2E1B</color>
+    <color name="bottom_nav_active">#4CAF50</color>
+    <color name="bottom_nav_inactive">#99FFFFFF</color>
+    <!--  60% white  -->
+    <color name="bottom_nav_top_line">#4CAF50</color>
+    <!--  Game Over screen  -->
+    <color name="game_over_bg">#1A1A1A</color>
+    <color name="game_over_text">#F44336</color>
+    <!--  Star rating  -->
+    <color name="star_filled">#FFC107</color>
+    <color name="star_empty">#E0E0E0</color>
 </resources>

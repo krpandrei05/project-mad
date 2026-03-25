@@ -39,6 +39,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    // Fragment support
+    implementation(libs.androidx.fragment)
+    // CardView
+    implementation(libs.androidx.cardview)
+    // DrawerLayout
+    implementation(libs.androidx.drawerlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

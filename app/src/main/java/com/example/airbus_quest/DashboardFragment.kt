@@ -12,8 +12,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class DashboardFragment : Fragment(), LocationListener {
     private val TAG = "DashboardFragment"
@@ -22,6 +24,7 @@ class DashboardFragment : Fragment(), LocationListener {
     private lateinit var tvLocation: TextView
     private lateinit var tvTemperature: TextView
     private lateinit var tvAirQuality: TextView
+    private lateinit var switchLocation: SwitchMaterial
 
     private val locationPermissionCode = 2
 
@@ -44,7 +47,37 @@ class DashboardFragment : Fragment(), LocationListener {
 
         locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        checkPermissionsAndStartLocation()
+        switchLocation = view.findViewById(R.id.switchLocation)
+
+        val savedState = requireActivity()
+            .getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+            .getBoolean("locationTrackingEnabled", false)
+
+        switchLocation.isChecked = savedState
+        if (savedState) {
+            checkPermissionsAndStartLocation()
+        }
+
+        switchLocation.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                Log.d(TAG, "Switch ON: starting GPS")
+                checkPermissionsAndStartLocation()
+                Toast.makeText(requireContext(), "Location tracking enabled", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.d(TAG, "Switch OFF: stopping GPS")
+                locationManager.removeUpdates(this)
+                Toast.makeText(requireContext(), "Location tracking disabled", Toast.LENGTH_SHORT).show()
+            }
+            saveSwitchState(isChecked)
+        }
+    }
+
+    private fun saveSwitchState(isEnabled: Boolean) {
+        requireActivity()
+            .getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("locationTrackingEnabled", isEnabled)
+            .apply()
     }
 
     private fun checkPermissionsAndStartLocation() {
@@ -79,9 +112,18 @@ class DashboardFragment : Fragment(), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
-        Log.i(TAG, "Location: ${location.latitude}, ${location.longitude}")
+        val timestamp = System.currentTimeMillis()
 
-        tvLocation.text = "Lat: %.4f, Long: %.4f".format(location.latitude, location.longitude)
+        val lat = "%.4f".format(location.latitude)
+        val long = "%.4f".format(location.longitude)
+        val alt = "%.1f".format(location.altitude)
+
+        Log.i(TAG, "Location updated: timestamp=$timestamp, lat=$lat, long=$long, alt=$alt")
+
+        val toastText = "New location: ${location.latitude}, ${location.longitude}"
+        Toast.makeText(requireContext(), toastText, Toast.LENGTH_SHORT).show()
+
+        tvLocation.text = "Lat: $lat, Long: $long"
 
         // Placeholder
         tvTemperature.text = "--°C"

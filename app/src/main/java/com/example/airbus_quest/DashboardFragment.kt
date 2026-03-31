@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
+import java.io.File
 
 class DashboardFragment : Fragment(), LocationListener {
     private val TAG = "DashboardFragment"
@@ -120,6 +121,7 @@ class DashboardFragment : Fragment(), LocationListener {
 
         Log.i(TAG, "Location updated: timestamp=$timestamp, lat=$lat, long=$long, alt=$alt")
 
+        saveCoordinatesToFile(location.latitude, location.longitude, location.altitude, timestamp)
         val toastText = "New location: ${location.latitude}, ${location.longitude}"
         Toast.makeText(requireContext(), toastText, Toast.LENGTH_SHORT).show()
 
@@ -128,6 +130,18 @@ class DashboardFragment : Fragment(), LocationListener {
         // Placeholder
         tvTemperature.text = "--°C"
         tvAirQuality.text = "Waiting for AQI data"
+    }
+
+    private fun saveCoordinatesToFile(latitude: Double, longitude: Double, altitude: Double, timestamp: Long) {
+        val fileName = "gps_coordinates.csv"
+        val file = File(requireContext().filesDir, fileName)
+
+        val formattedLat = "%.4f".format(latitude)
+        val formattedLong = "%.4f".format(longitude)
+        val formattedAlt = "%.2f".format(altitude)
+
+        file.appendText("$timestamp;$formattedLat;$formattedLong;$formattedAlt\n")
+        Log.d(TAG, "CSV saved: $timestamp;$formattedLat;$formattedLong;$formattedAlt")
     }
 
     override fun onDestroyView() {

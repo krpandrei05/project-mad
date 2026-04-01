@@ -11,6 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import android.widget.TextView
+import java.io.IOException
 
 class SecondActivity : AppCompatActivity() {
     private val SecondTag = "SecondActivity"
@@ -54,6 +56,9 @@ class SecondActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "User ID: $userIdentifier", Toast.LENGTH_LONG).show()
         }
+
+        val tvFileContents: TextView = findViewById(R.id.tvFileContents)
+        tvFileContents.text = readFileContents()
     }
 
     private fun showUserIdentifierDialog() {
@@ -97,5 +102,18 @@ class SecondActivity : AppCompatActivity() {
     private fun getUserIdentifier(): String? {
         val sharedPreferences = this.getSharedPreferences("AppPreferences", MODE_PRIVATE)
         return sharedPreferences.getString("userIdentifier", null)
+    }
+
+    private fun readFileContents(): String {
+        val fileName = "gps_coordinates.csv"
+        return try {
+            openFileInput(fileName).bufferedReader().useLines { lines ->
+                lines.fold("") { some, text ->
+                    "$some\n$text"
+                }
+            }
+        } catch (e: IOException) {
+            "Error reading file: ${e.message}"
+        }
     }
 }

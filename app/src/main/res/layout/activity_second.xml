@@ -13,7 +13,20 @@
         android:layout_height="wrap_content"
         android:text="Set User ID"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btnMainActivity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/tvFileContents"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="No GPS data yet"
+        android:padding="16dp"
+        android:scrollbars="vertical"
+        android:fontFamily="monospace"
+        app:layout_constraintTop_toBottomOf="@id/btnUserIdentifier"
+        app:layout_constraintBottom_toTopOf="@id/btnMainActivity"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.appcompat.app.AlertDialog
 
 class ThirdActivity : AppCompatActivity() {
     private val ThirdTag = "ThirdActivity"
@@ -31,5 +33,28 @@ class ThirdActivity : AppCompatActivity() {
             val intent = Intent(this, SecondActivity::class.java)
             startActivity(intent)
         }
+
+        val btnDeleteCoordinate: Button = findViewById(R.id.btnDeleteCoordinate)
+        btnDeleteCoordinate.setOnClickListener {
+            Log.d(ThirdTag, "Click: Delete coordinate requested.")
+            showDeleteConfirmationDialog()
+        }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete Coordinate")
+        builder.setMessage("Are you sure you want to delete this coordinate?")
+
+        builder.setPositiveButton("Delete") { _, _ ->
+            Log.d(ThirdTag, "Click: Delete coordinate confirmed.")
+            Toast.makeText(this, "Coordinate deleted!", Toast.LENGTH_LONG).show()
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            Log.d(ThirdTag, "Click: Delete coordinate canceled.")
+            dialog.cancel()
+        }
+        builder.show()
     }
 }

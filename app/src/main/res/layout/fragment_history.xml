@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- ══════════════════════════════════════════════════════════
-     HISTORY FRAGMENT (Character List / Game Record)
-     Simple RecyclerView with character cards.
-     Each card shows avatar, name, stats, and alive/dead badge.
+     HISTORY FRAGMENT (GPS Coordinates List)
+     ListView with CSV coordinates data.
+     Each item shows one GPS record: timestamp;lat;lon;alt
      ══════════════════════════════════════════════════════════ -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCharacters"
+    <ListView
+        android:id="@+id/lvCoordinates"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/screen_margin"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:divider="@color/divider"
+        android:dividerHeight="1dp" />
 
-    <!-- Empty state: shown when no characters exist yet -->
+    <!-- Empty state: shown when no GPS data exists yet -->
     <LinearLayout
         android:id="@+id/layoutEmpty"
         android:layout_width="wrap_content"
@@ -32,13 +35,12 @@
             android:layout_height="80dp"
             android:src="@android:drawable/ic_menu_myplaces"
             app:tint="@color/text_hint"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:contentDescription="No characters" />
+            android:contentDescription="No GPS data" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/no_character_msg"
+            android:text="No GPS data yet.\nEnable location tracking to record coordinates."
             android:textSize="14sp"
             android:textColor="@color/text_hint"
             android:textAlignment="center"

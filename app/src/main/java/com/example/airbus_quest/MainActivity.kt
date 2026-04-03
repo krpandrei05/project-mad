@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.drawer_settings -> {
                     Log.d(TAG, "Drawer: Settings clicked")
-                    val intent = Intent(this, SecondActivity::class.java)
+                    val intent = Intent(this, SettingsActivity::class.java)
                     startActivity(intent)
                 }
 

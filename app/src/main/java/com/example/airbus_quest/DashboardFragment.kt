@@ -15,7 +15,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.switchmaterial.SwitchMaterial
 import java.io.File
 
 class DashboardFragment : Fragment(), LocationListener {
@@ -25,7 +24,6 @@ class DashboardFragment : Fragment(), LocationListener {
     private lateinit var tvLocation: TextView
     private lateinit var tvTemperature: TextView
     private lateinit var tvAirQuality: TextView
-    private lateinit var switchLocation: SwitchMaterial
 
     private val locationPermissionCode = 2
 
@@ -46,39 +44,16 @@ class DashboardFragment : Fragment(), LocationListener {
         tvTemperature = view.findViewById(R.id.tvTemperature)
         tvAirQuality = view.findViewById(R.id.tvAirQuality)
 
-        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        switchLocation = view.findViewById(R.id.switchLocation)
+        locationManager =
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         val savedState = requireActivity()
             .getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
             .getBoolean("locationTrackingEnabled", false)
 
-        switchLocation.isChecked = savedState
         if (savedState) {
             checkPermissionsAndStartLocation()
         }
-
-        switchLocation.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                Log.d(TAG, "Switch ON: starting GPS")
-                checkPermissionsAndStartLocation()
-                Toast.makeText(requireContext(), "Location tracking enabled", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d(TAG, "Switch OFF: stopping GPS")
-                locationManager.removeUpdates(this)
-                Toast.makeText(requireContext(), "Location tracking disabled", Toast.LENGTH_SHORT).show()
-            }
-            saveSwitchState(isChecked)
-        }
-    }
-
-    private fun saveSwitchState(isEnabled: Boolean) {
-        requireActivity()
-            .getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean("locationTrackingEnabled", isEnabled)
-            .apply()
     }
 
     private fun checkPermissionsAndStartLocation() {

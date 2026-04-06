@@ -15,6 +15,9 @@ import android.widget.LinearLayout
 class HistoryFragment : Fragment() {
     private val TAG = "HistoryFragment"
 
+    private lateinit var lvCoordinates: ListView
+    private lateinit var layoutEmpty: LinearLayout
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -28,9 +31,16 @@ class HistoryFragment : Fragment() {
 
         Log.d(TAG, "onViewCreated: HistoryFragment ready")
 
-        val lvCoordinates: ListView = view.findViewById(R.id.lvCoordinates)
-        val layoutEmpty: LinearLayout = view.findViewById(R.id.layoutEmpty)
+        lvCoordinates = view.findViewById(R.id.lvCoordinates)
+        layoutEmpty = view.findViewById(R.id.layoutEmpty)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        loadCoordinates()
+    }
+
+    private fun loadCoordinates() {
         val lines = readFileLines()
 
         if (lines.isEmpty()) {
@@ -55,12 +65,10 @@ class HistoryFragment : Fragment() {
 
                 if (parts.size == 4) {
                     val intent = Intent(requireContext(), ThirdActivity::class.java)
-
                     intent.putExtra("timestamp", parts[0])
                     intent.putExtra("latitude", parts[1])
                     intent.putExtra("longitude", parts[2])
                     intent.putExtra("altitude", parts[3])
-
                     Log.d(TAG, "Click on: $line")
                     startActivity(intent)
                 }

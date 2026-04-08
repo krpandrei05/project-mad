@@ -10,6 +10,11 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import androidx.lifecycle.lifecycleScope
+import com.example.airbus_quest.room.AppDatabase
+import com.example.airbus_quest.room.EmtStations
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
@@ -98,6 +103,15 @@ class MainActivity : AppCompatActivity() {
         // Initial State/Fragment
         if (savedInstanceState == null) {
             bottomNav.selectedItemId = R.id.nav_dashboard
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(applicationContext)
+            val count = db.stationDao().getCount()
+            if (count == 0) {
+                db.stationDao().insertAll(EmtStations.getStations())
+                Log.d(TAG, "EMT stations dataset inserted: ${EmtStations.getStations().size} stations")
+            }
         }
     }
 

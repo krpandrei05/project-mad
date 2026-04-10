@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ══════════════════════════════════════════════════════════
+     ITEM: Avatar selection card (CreateCharacter horizontal scroll)
+     Square card (120x120dp) with:
+       - Avatar image (70% of card)
+       - Type name below ("The Tired Commuter")
+     Border changes: green thick (selected) / grey thin (unselected)
+     Set in code: itemView.background = bg_avatar_selected or bg_avatar_unselected
+     ══════════════════════════════════════════════════════════ -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/avatar_selection"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="@dimen/spacing_sm"
+    android:layout_marginEnd="@dimen/spacing_sm"
+    android:background="@drawable/bg_avatar_unselected"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Avatar image -->
+    <ImageView
+        android:id="@+id/ivAvatarOption"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@android:drawable/ic_menu_myplaces"
+        android:scaleType="fitCenter"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:contentDescription="Avatar option" />
+
+    <!-- Avatar type name -->
+    <TextView
+        android:id="@+id/tvAvatarType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="The Commuter"
+        android:textSize="11sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/text_secondary"
+        android:textAlignment="center"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:layout_marginBottom="@dimen/spacing_sm"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+</LinearLayout>

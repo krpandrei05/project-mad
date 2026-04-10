@@ -58,9 +58,9 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
 
-                R.id.drawer_about -> {
-                    Log.d(TAG, "Drawer: About clicked")
-                    val intent = Intent(this, ThirdActivity::class.java)
+                R.id.drawer_create_character -> {
+                    Log.d(TAG, "Drawer: Create Character clicked")
+                    val intent = Intent(this, CreateCharacterActivity::class.java)
                     startActivity(intent)
                 }
 

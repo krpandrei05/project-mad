@@ -15,9 +15,9 @@
             android:title="@string/nav_settings" />
 
         <item
-            android:id="@+id/drawer_about"
-            android:icon="@android:drawable/ic_menu_info_details"
-            android:title="@string/nav_about" />
+            android:id="@+id/drawer_create_character"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="@string/btn_create_character" />
 
     </group>
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Border for the SELECTED avatar card in CreateCharacterActivity.
+     Thick green border signals which avatar is currently chosen.
+     Unselected cards use bg_avatar_unselected.xml (thin grey border). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/surface" />
+    <stroke android:width="3dp" android:color="@color/accent" />
+    <corners android:radius="@dimen/card_corner_radius" />
+</shape>

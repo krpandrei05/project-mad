@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ══════════════════════════════════════════════════════════
-     HISTORY FRAGMENT (GPS Coordinates List)
-     ListView with CSV coordinates data.
-     Each item shows one GPS record: timestamp;lat;lon;alt
-     ══════════════════════════════════════════════════════════ -->
-<FrameLayout
+<!--
+    HISTORY FRAGMENT
+    I structure this layout in three sections:
+    - Top ListView: shows characters from Room (item_character.xml)
+    - Empty state: shown when no characters exist yet
+    - Coordinates section: hidden by default, revealed when user taps a character
+      Contains a title with the selected character name and a ListView for CSV coordinates
+-->
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/background">
 
+    <!-- Characters ListView -->
     <ListView
-        android:id="@+id/lvCoordinates"
+        android:id="@+id/lvCharacters"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="@dimen/screen_margin"
         android:clipToPadding="false"
         android:divider="@color/divider"
         android:dividerHeight="1dp" />
 
-    <!-- Empty state: shown when no GPS data exists yet -->
+    <!-- Empty state: shown when no characters exist in Room -->
     <LinearLayout
         android:id="@+id/layoutEmpty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:visibility="gone">
 
         <ImageView
@@ -35,16 +41,85 @@
             android:layout_height="80dp"
             android:src="@android:drawable/ic_menu_myplaces"
             app:tint="@color/text_hint"
-            android:contentDescription="No GPS data" />
+            android:contentDescription="No characters" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No GPS data yet.\nEnable location tracking to record coordinates."
+            android:text="@string/no_character_msg"
             android:textSize="14sp"
             android:textColor="@color/text_hint"
             android:textAlignment="center"
             android:layout_marginTop="@dimen/spacing_md" />
     </LinearLayout>
 
-</FrameLayout>
+    <!-- Coordinates section: hidden until user taps a character -->
+    <LinearLayout
+        android:id="@+id/layoutCoordinates"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Green separator line to visually separate the two sections -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/accent" />
+
+        <!-- Title showing the selected character's name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/surface">
+
+            <TextView
+                android:id="@+id/tvSelectedCharacterName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="GPS History"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/text_primary"
+                android:padding="@dimen/spacing_md" />
+
+            <ImageView
+                android:id="@+id/btnCloseCoordinates"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:padding="8dp"
+                android:layout_marginEnd="@dimen/spacing_sm"
+                android:contentDescription="Close" />
+        </LinearLayout>
+
+        <!-- Coordinates ListView: populated from gps_coordinates.csv -->
+        <ListView
+            android:id="@+id/lvCoordinates"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="@dimen/spacing_sm"
+            android:clipToPadding="false"
+            android:divider="@color/divider"
+            android:dividerHeight="1dp" />
+
+        <!-- Shown when CSV has no data for this character -->
+        <TextView
+            android:id="@+id/tvNoCoordinates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No GPS data recorded for this character."
+            android:textSize="13sp"
+            android:textColor="@color/text_hint"
+            android:textAlignment="center"
+            android:padding="@dimen/spacing_md"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>

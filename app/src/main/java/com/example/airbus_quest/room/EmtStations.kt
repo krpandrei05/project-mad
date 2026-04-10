@@ -1,7 +1,5 @@
 package com.example.airbus_quest.room
 
-// Dataset cu 30 stații EMT reale din Madrid.
-// Inserat la prima lansare a aplicației în StationDao.
 object EmtStations {
     fun getStations(): List<Station> = listOf(
         Station(name = "Puerta del Sol", latitude = 40.4168, longitude = -3.7038, busLine = "3"),

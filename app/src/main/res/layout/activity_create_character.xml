@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ══════════════════════════════════════════════════════════
+     CREATE CHARACTER SCREEN
+     Accessed from MainMenu. Has its own toolbar with back arrow.
+     Bottom nav is visible but no tab is highlighted (secondary screen).
+     Layout: nickname input → avatar selector (horizontal scroll) → create button
+     ══════════════════════════════════════════════════════════ -->
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/createCharacterRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/background">
+
+        <!-- Toolbar cu back arrow -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarCreateCharacter"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:background="@color/primary"
+            android:elevation="4dp"
+            app:titleTextColor="@color/text_on_dark"
+            app:navigationIconTint="@color/text_on_dark"
+            app:title="@string/create_character_title" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_margin">
+
+                <!-- ═══ NICKNAME INPUT ═══ -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilNickname"
+                    style="@style/AirBusInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_nickname"
+                    app:startIconDrawable="@android:drawable/ic_menu_edit"
+                    app:startIconTint="@color/text_secondary"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNickname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:maxLength="20"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <!-- ═══ AVATAR SELECTION ═══ -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/choose_avatar"
+                    style="@style/AirBusSectionTitle" />
+
+                <!-- Horizontal scrollable list of avatar cards -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAvatarSelection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:clipToPadding="false"
+                    android:layout_marginBottom="@dimen/spacing_xl" />
+
+
+                <!-- ═══ PREVIEW ═══
+                     Shows a larger preview of the selected avatar -->
+                <LinearLayout
+                    android:id="@+id/layoutPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:visibility="gone"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <ImageView
+                        android:id="@+id/ivPreviewAvatar"
+                        android:layout_width="@dimen/avatar_medium"
+                        android:layout_height="@dimen/avatar_medium"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Selected avatar preview" />
+
+                    <TextView
+                        android:id="@+id/tvPreviewType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/accent"
+                        android:layout_marginTop="@dimen/spacing_sm" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ═══ CREATE BUTTON (pinned to bottom) ═══ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/screen_margin"
+            android:background="@color/background"
+            android:elevation="8dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCreate"
+                style="@style/AirBusButton.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/button_height"
+                android:text="@string/btn_create"
+                android:enabled="false" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>

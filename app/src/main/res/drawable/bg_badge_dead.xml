@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/aqi_hazardous" />
+    <corners android:radius="@dimen/badge_corner_radius" />
+    <padding
+        android:left="@dimen/badge_padding_horizontal"
+        android:right="@dimen/badge_padding_horizontal"
+        android:top="@dimen/badge_padding_vertical"
+        android:bottom="@dimen/badge_padding_vertical" />
+</shape>

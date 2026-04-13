@@ -45,6 +45,20 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        // Preload the current API key — empty if user hasn't set one yet
+        val editTextApiKey: EditText = findViewById(R.id.editTextApiKey)
+        editTextApiKey.setText(sharedPreferences.getString("API_KEY", ""))
+        editTextApiKey.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val newKey = editTextApiKey.text.toString().trim()
+                if (newKey.isNotBlank()) {
+                    sharedPreferences.edit().putString("API_KEY", newKey).apply()
+                    Toast.makeText(this, "API key saved", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "API key updated")
+                }
+            }
+        }
+
         val switchLocationTracking: SwitchMaterial = findViewById(R.id.switchLocationTracking)
         switchLocationTracking.isChecked = sharedPreferences.getBoolean("locationTrackingEnabled", false)
         switchLocationTracking.setOnCheckedChangeListener { _, isChecked ->

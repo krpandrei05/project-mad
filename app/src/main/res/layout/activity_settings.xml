@@ -66,6 +66,35 @@
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
 
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/divider" />
+
+                <!-- ═══ API KEY ═══ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/spacing_md"
+                    android:paddingBottom="@dimen/spacing_md">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OpenWeather API Key"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary" />
+
+                    <EditText
+                        android:id="@+id/editTextApiKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter your API key (optional)"
+                        android:inputType="text"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" />
 
                 <!-- ═══ LOCATION TRACKING ═══ -->

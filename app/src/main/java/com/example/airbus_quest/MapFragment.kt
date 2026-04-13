@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.example.airbus_quest.viewmodel.MapViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -20,6 +22,7 @@ import org.osmdroid.views.overlay.Polyline
 class MapFragment : Fragment() {
     private val TAG = "MapFragment"
     private lateinit var map: MapView
+    private val viewModel: MapViewModel by viewModels()
 
     private val campusMap = mapOf(
         "Tennis" to GeoPoint(40.38779608214728, -3.627687914352839),
@@ -68,6 +71,13 @@ class MapFragment : Fragment() {
         map.overlays.add(myMarker)
 
         addRouteMarkers()
+
+        // Observe stations from ViewModel — cached after first load
+        viewModel.stations.observe(viewLifecycleOwner) { stations ->
+            Log.d(TAG, "Stations available: ${stations.size}")
+            // I will use these in Commit 4 for AQI markers
+        }
+        viewModel.loadStations()
 
         Log.d(TAG, "Map configured with ${campusMap.size} markers")
     }

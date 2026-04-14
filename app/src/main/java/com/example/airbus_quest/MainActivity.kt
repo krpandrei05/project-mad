@@ -1,18 +1,21 @@
 package com.example.airbus_quest
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationView
 import androidx.lifecycle.lifecycleScope
 import com.example.airbus_quest.room.AppDatabase
 import com.example.airbus_quest.room.EmtStations
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -25,9 +28,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var drawerToggle: ActionBarDrawerToggle
 
+    // Create fragment instances once — they are never recreated on tab switch
+    private val dashboardFragment = DashboardFragment()
+    private val mapFragment = MapFragment()
+    private val reportFragment = ReportFragment()
+    private val historyFragment = HistoryFragment()
+    private lateinit var tvDrawerUsername: TextView
+
+    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "userIdentifier") {
+            val username = prefs.getString("userIdentifier", "Username") ?: "Username"
+            tvDrawerUsername.text = username
+            Log.d(TAG, "Username updated in drawer: $username")
+        }
+    }
+
+    private lateinit var prefs: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
 
         Log.d(TAG, "onCreate: MainActivity created as shell container")
@@ -40,13 +59,9 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawerLayout)
         navView = findViewById(R.id.navView)
         drawerToggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            toolbar,
-            R.string.nav_dashboard,
-            R.string.nav_dashboard
+            this, drawerLayout, toolbar,
+            R.string.nav_dashboard, R.string.nav_dashboard
         )
-
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
@@ -54,16 +69,12 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.drawer_settings -> {
                     Log.d(TAG, "Drawer: Settings clicked")
-                    val intent = Intent(this, SettingsActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, SettingsActivity::class.java))
                 }
-
                 R.id.drawer_create_character -> {
                     Log.d(TAG, "Drawer: Create Character clicked")
-                    val intent = Intent(this, CreateCharacterActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, CreateCharacterActivity::class.java))
                 }
-
                 R.id.drawer_logout -> {
                     Log.d(TAG, "Drawer: Logout clicked")
                 }
@@ -72,55 +83,82 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // 3. Bottom Navigation Config
+        prefs = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        prefs.registerOnSharedPreferenceChangeListener(prefsListener)
+
+        // Bind the drawer header username TextView
+        tvDrawerUsername = navView.getHeaderView(0).findViewById(R.id.tvDrawerUsername)
+        tvDrawerUsername.text = prefs.getString("userIdentifier", "Username") ?: "Username"
+
+        // 3. Bottom Nav Config
         bottomNav = findViewById(R.id.bottomNav)
+
+        // Add all fragments once at startup — hiding all except Dashboard
+        if (savedInstanceState == null) {
+            initFragments()
+        }
+
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_dashboard -> {
-                    loadFragment(DashboardFragment())
-                    toolbar.title = getString(R.string.dashboard_title)
+                    showFragment(dashboardFragment, getString(R.string.dashboard_title))
                     true
                 }
                 R.id.nav_map -> {
-                    loadFragment(MapFragment())
-                    toolbar.title = getString(R.string.map_title)
+                    showFragment(mapFragment, getString(R.string.map_title))
                     true
                 }
                 R.id.nav_report -> {
-                    loadFragment(ReportFragment())
-                    toolbar.title = getString(R.string.report_title)
+                    showFragment(reportFragment, getString(R.string.report_title))
                     true
                 }
                 R.id.nav_history -> {
-                    loadFragment(HistoryFragment())
-                    toolbar.title = getString(R.string.history_title)
+                    showFragment(historyFragment, getString(R.string.history_title))
                     true
                 }
                 else -> false
             }
         }
 
-        // Initial State/Fragment
-        if (savedInstanceState == null) {
-            bottomNav.selectedItemId = R.id.nav_dashboard
-        }
+        // Set Dashboard as the default tab
+        bottomNav.selectedItemId = R.id.nav_dashboard
 
+        // 4. Insert EMT stations on first launch if table is empty
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(applicationContext)
-            val count = db.stationDao().getCount()
-            if (count == 0) {
+            if (db.stationDao().getCount() == 0) {
                 db.stationDao().insertAll(EmtStations.getStations())
-                Log.d(TAG, "EMT stations dataset inserted: ${EmtStations.getStations().size} stations")
+                Log.d(TAG, "EMT stations inserted: ${EmtStations.getStations().size}")
             }
         }
     }
 
-    // Helper
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
+    // Add all fragments to the container at once and hide all except Dashboard.
+    // This way fragments are never destroyed and recreated on tab switch.
+    private fun initFragments() {
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fragmentContainer, dashboardFragment, "dashboard")
+            .add(R.id.fragmentContainer, mapFragment, "map").hide(mapFragment)
+            .add(R.id.fragmentContainer, reportFragment, "report").hide(reportFragment)
+            .add(R.id.fragmentContainer, historyFragment, "history").hide(historyFragment)
             .commit()
-        Log.d(TAG, "Fragment loaded: ${fragment.javaClass.simpleName}")
+    }
+
+    // I show the selected fragment and hide all others — no recreation, no data loss
+    private fun showFragment(fragment: Fragment, title: String) {
+        supportFragmentManager.beginTransaction()
+            .hide(dashboardFragment)
+            .hide(mapFragment)
+            .hide(reportFragment)
+            .hide(historyFragment)
+            .show(fragment)
+            .commit()
+        toolbar.title = title
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
+        Log.d(TAG, "MainActivity destroyed, prefs listener unregistered")
     }
 }

@@ -119,10 +119,9 @@
                 <!-- Weather icon (sun, cloud, rain) -->
                 <ImageView
                     android:id="@+id/ivWeatherIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:src="@android:drawable/btn_star_big_on"
-                    app:tint="@color/aqi_moderate"
                     android:contentDescription="Weather icon"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvTemperature"

@@ -13,4 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-desktop.ini
+app/src/main/java/com/example/airbus_quest/Credentials.kt

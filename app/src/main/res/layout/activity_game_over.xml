@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ══════════════════════════════════════════════════════════
+     GAME OVER SCREEN
+     Standalone dark screen. No toolbar, no bottom nav, no drawer.
+     Full-screen dramatic presentation:
+       - Dead avatar (greyed out, centered)
+       - "YOUR CHARACTER DIED" in red
+       - Final stats (days, stations, max HP)
+       - Single green button: "Create New Character"
+
+     Theme: Theme.AirBusQuest.GameOver (set in AndroidManifest)
+     ══════════════════════════════════════════════════════════ -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@color/game_over_bg"
+    android:padding="@dimen/spacing_xl">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Dead avatar: greyed out, semi-transparent -->
+    <ImageView
+        android:id="@+id/ivDeadAvatar"
+        android:layout_width="@dimen/avatar_large"
+        android:layout_height="@dimen/avatar_large"
+        android:src="@android:drawable/ic_menu_myplaces"
+        android:scaleType="fitCenter"
+        android:alpha="0.4"
+        android:contentDescription="Dead avatar" />
+
+    <!-- Death message: large red text -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/game_over_text"
+        android:textSize="28sp"
+        android:fontFamily="sans-serif-bold"
+        android:textColor="@color/game_over_text"
+        android:letterSpacing="0.1"
+        android:layout_marginTop="@dimen/spacing_lg" />
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/game_over_subtitle"
+        android:textSize="14sp"
+        android:textColor="@color/text_on_dark_secondary"
+        android:layout_marginTop="@dimen/spacing_sm" />
+
+    <!-- ═══ FINAL STATS ═══ -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/spacing_xl">
+
+        <TextView
+            android:id="@+id/tvStatDays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Survived 12 days"
+            android:textSize="16sp"
+            android:textColor="@color/text_on_dark"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/tvStatStations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Visited 28 stations"
+            android:textSize="14sp"
+            android:textColor="@color/text_on_dark_secondary"
+            android:layout_marginTop="@dimen/spacing_sm" />
+
+        <TextView
+            android:id="@+id/tvStatMaxHp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Max HP reached: 95"
+            android:textSize="14sp"
+            android:textColor="@color/text_on_dark_secondary"
+            android:layout_marginTop="@dimen/spacing_xs" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Create new character button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNewCharacter"
+        style="@style/AirBusButton.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:text="@string/btn_new_character"
+        android:layout_marginBottom="@dimen/spacing_lg" />
+
+</LinearLayout>

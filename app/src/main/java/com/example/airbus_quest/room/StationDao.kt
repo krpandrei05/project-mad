@@ -8,7 +8,7 @@ interface StationDao {
     @Insert
     suspend fun insert(station: Station): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(stations: List<Station>)
 
     @Query("SELECT * FROM STATIONS")
@@ -22,4 +22,7 @@ interface StationDao {
 
     @Delete
     suspend fun delete(station: Station)
+
+    @Query("DELETE FROM STATIONS")
+    suspend fun deleteAll()
 }

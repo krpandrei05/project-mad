@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.airbus_quest.api.RetrofitClient
 import com.example.airbus_quest.room.AppDatabase
 import com.example.airbus_quest.room.EmtStations
 import com.google.android.material.appbar.MaterialToolbar
@@ -123,14 +124,8 @@ class MainActivity : AppCompatActivity() {
         // Set Dashboard as the default tab
         bottomNav.selectedItemId = R.id.nav_dashboard
 
-        // 4. Insert EMT stations on first launch if table is empty
-        lifecycleScope.launch(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(applicationContext)
-            if (db.stationDao().getCount() == 0) {
-                db.stationDao().insertAll(EmtStations.getStations())
-                Log.d(TAG, "EMT stations inserted: ${EmtStations.getStations().size}")
-            }
-        }
+        // 4. EMT stations are fetched dynamically on GPS update in DashboardFragment
+        Log.d(TAG, "EMT stations will be fetched on first GPS update")
     }
 
     // Add all fragments to the container at once and hide all except Dashboard.

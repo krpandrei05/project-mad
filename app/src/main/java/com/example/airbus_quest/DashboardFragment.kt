@@ -2,6 +2,7 @@ package com.example.airbus_quest
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -18,9 +19,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.airbus_quest.api.RetrofitClient
+import com.example.airbus_quest.room.AppDatabase
 import com.example.airbus_quest.viewmodel.DashboardViewModel
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DashboardFragment : Fragment(), LocationListener {
     private val TAG = "DashboardFragment"
@@ -33,6 +40,15 @@ class DashboardFragment : Fragment(), LocationListener {
     private lateinit var viewAqiCircle: View
     private lateinit var ivWeatherIcon: ImageView
     private val viewModel: DashboardViewModel by viewModels()
+    private lateinit var gameEngine: GameEngine
+    private lateinit var tvNickname: TextView
+    private lateinit var tvHpValue: TextView
+    private lateinit var tvStats: TextView
+    private lateinit var viewHpFill: View
+    private lateinit var rvRecommendations: androidx.recyclerview.widget.RecyclerView
+    private lateinit var tvNoAlerts: TextView
+    private val recommendations = mutableListOf<RecommendationItem>()
+    private lateinit var recommendationAdapter: RecommendationAdapter
 
     private val locationPermissionCode = 2
 
@@ -55,6 +71,20 @@ class DashboardFragment : Fragment(), LocationListener {
         tvAqiNumber = view.findViewById(R.id.tvAqiNumber)
         viewAqiCircle = view.findViewById(R.id.viewAqiCircle)
         ivWeatherIcon = view.findViewById(R.id.ivWeatherIcon)
+        gameEngine = GameEngine(requireContext())
+        tvNickname = view.findViewById(R.id.tvNickname)
+        tvHpValue = view.findViewById(R.id.tvHpValue)
+        tvStats = view.findViewById(R.id.tvStats)
+        viewHpFill = view.findViewById(R.id.viewHpFill)
+        rvRecommendations = view.findViewById(R.id.rvRecommendations)
+        tvNoAlerts = view.findViewById(R.id.tvNoAlerts)
+        recommendationAdapter = RecommendationAdapter(requireContext(), recommendations)
+        rvRecommendations.layoutManager =
+            androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+        rvRecommendations.adapter = recommendationAdapter
+
+        // Load active character on start
+        loadActiveCharacter()
 
         locationManager =
             requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -93,6 +123,8 @@ class DashboardFragment : Fragment(), LocationListener {
             }
             viewAqiCircle.backgroundTintList =
                 ContextCompat.getColorStateList(requireContext(), colorRes)
+
+            updateRecommendations(aqiValue)
         }
 
         // Use Glide to load the weather icon URL from LiveData
@@ -148,6 +180,21 @@ class DashboardFragment : Fragment(), LocationListener {
 
         // Delegate the API calls to the ViewModel
         viewModel.fetchWeatherData(location.latitude, location.longitude)
+
+        // TODO: remove hardcoded coordinates
+        fetchNearbyEmtStops(40.4168, -3.7038)
+
+        // Run game logic for nearby stations
+        val lastAqi = viewModel.aqi.value ?: 1
+        gameEngine.onLocationUpdate(
+            lat = location.latitude,
+            lon = location.longitude,
+            currentAqi = lastAqi,
+            onHpChanged = { newHp -> updateHpUI(newHp) },
+            onGameOver = {
+                startActivity(Intent(requireContext(), GameOverActivity::class.java))
+            }
+        )
     }
 
     private fun saveCoordinatesToFile(latitude: Double, longitude: Double, altitude: Double, timestamp: Long) {
@@ -160,6 +207,112 @@ class DashboardFragment : Fragment(), LocationListener {
 
         file.appendText("$timestamp;$formattedLat;$formattedLong;$formattedAlt\n")
         Log.d(TAG, "CSV saved: $timestamp;$formattedLat;$formattedLong;$formattedAlt")
+    }
+
+    private fun loadActiveCharacter() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(requireContext())
+            val character = db.characterDao().getActiveCharacter()
+            withContext(Dispatchers.Main) {
+                character?.let {
+                    tvNickname.text = it.nickname
+                    updateHpUI(it.hp)
+                    tvStats.text = getString(
+                        R.string.day_stations_format,
+                        it.dayCount,
+                        it.stationsVisited
+                    )
+                }
+            }
+        }
+    }
+
+    private fun updateHpUI(hp: Int) {
+        tvHpValue.text = getString(R.string.hp_format, hp)
+
+        // Scale the HP bar width proportionally to HP percentage
+        viewHpFill.post {
+            val parentWidth = (viewHpFill.parent as android.view.View).width
+            val params = viewHpFill.layoutParams
+            params.width = (parentWidth * hp / 100f).toInt()
+            viewHpFill.layoutParams = params
+        }
+
+        // Change HP bar color by threshold
+        val colorRes = when {
+            hp > 60 -> R.color.hp_excellent
+            hp > 30 -> R.color.hp_warning
+            else -> R.color.hp_critical
+        }
+        viewHpFill.backgroundTintList =
+            ContextCompat.getColorStateList(requireContext(), colorRes)
+    }
+
+    private fun fetchNearbyEmtStops(lat: Double, lon: Double) {
+        val radius = 500
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val loginResp = RetrofitClient.emtService
+                    .login(Credentials.EMT_EMAIL, Credentials.EMT_PASSWORD)
+                    .execute()
+
+                val token = loginResp.body()?.data?.firstOrNull()?.accessToken ?: run {
+                    Log.e(TAG, "EMT login failed")
+                    return@launch
+                }
+
+                val stops = RetrofitClient.emtService
+                    .getStopsAroundLocation(token, lon, lat, radius)
+                    .execute()
+                    .body()?.data ?: run {
+                    Log.e(TAG, "EMT stops fetch failed")
+                    return@launch
+                }
+
+                val db = AppDatabase.getDatabase(requireContext())
+                val stations = stops.map { stop ->
+                    com.example.airbus_quest.room.Station(
+                        name = stop.stopName,
+                        latitude = stop.geometry.coordinates[1],
+                        longitude = stop.geometry.coordinates[0],
+                        busLine = stop.lines?.firstOrNull()?.label ?: "EMT"
+                    )
+                }
+                db.stationDao().insertAll(stations)
+                Log.d(TAG, "EMT nearby stops saved: ${stations.size}")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "EMT fetch error: ${e.message}")
+            }
+        }
+    }
+
+    private fun updateRecommendations(aqi: Int) {
+        recommendations.clear()
+        when {
+            aqi >= 5 -> recommendations.add(
+                RecommendationItem("Very poor air quality! Stay indoors.", aqi, "now")
+            )
+            aqi == 4 -> recommendations.add(
+                RecommendationItem("Poor air quality near this station. Avoid prolonged exposure.", aqi, "now")
+            )
+            aqi == 3 -> recommendations.add(
+                RecommendationItem("Moderate air quality. Sensitive groups should be cautious.", aqi, "now")
+            )
+            aqi <= 2 -> recommendations.add(
+                RecommendationItem("Good air quality. Safe to travel!", aqi, "now")
+            )
+        }
+
+        if (recommendations.isEmpty()) {
+            tvNoAlerts.visibility = View.VISIBLE
+            rvRecommendations.visibility = View.GONE
+        } else {
+            tvNoAlerts.visibility = View.GONE
+            rvRecommendations.visibility = View.VISIBLE
+        }
+        recommendationAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {

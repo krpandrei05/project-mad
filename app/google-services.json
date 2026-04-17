@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "670875509134",
+    "project_id": "airbus-quest",
+    "storage_bucket": "airbus-quest.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670875509134:android:6e3bab20d44bb5f3cfc4df",
+        "android_client_info": {
+          "package_name": "com.example.airbus_quest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670875509134-ecmmpkhgk2kl8srv16eapnr8l32a2k8l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.airbus_quest",
+            "certificate_hash": "2623db19ab1ba7f51841172408e538857f56e431"
+          }
+        },
+        {
+          "client_id": "670875509134-06ht46mkbhb60tqkgm036cb25gu9hk2r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgit-cduVyaDqSb1lx5LscgZLIXrmRcU4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670875509134-06ht46mkbhb60tqkgm036cb25gu9hk2r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

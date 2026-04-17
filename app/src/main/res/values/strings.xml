@@ -29,6 +29,9 @@
     <string name="confirm_create_msg">Create %s as a %s?</string>
     <string name="confirm_create_yes">Let\'s go!</string>
     <string name="cancel">Cancel</string>
+    <string name="signed_in">Signed in!</string>
+    <string name="signed_out">Signed out!</string>
+    <string name="signed_cancelled">Signed in cancelled</string>
     <!--  Dashboard  -->
     <string name="dashboard_title">Dashboard</string>
     <string name="hp_label">HP</string>

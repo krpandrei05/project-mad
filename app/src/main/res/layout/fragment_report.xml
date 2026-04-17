@@ -183,9 +183,10 @@
             android:id="@+id/btnSubmitReport"
             style="@style/AirBusButton.Primary"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
             android:text="@string/btn_submit_report"
             android:layout_marginBottom="@dimen/spacing_md" />
-
     </LinearLayout>
 </ScrollView>

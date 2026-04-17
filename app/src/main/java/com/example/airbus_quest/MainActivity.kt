@@ -47,6 +47,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Redirect to LoginActivity if not authenticated
+        if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

@@ -30,6 +30,7 @@ import com.example.airbus_quest.api.RetrofitClient
 import com.example.airbus_quest.room.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.google.firebase.database.FirebaseDatabase
 
 class MapFragment : Fragment(), LocationListener {
 
@@ -44,6 +45,7 @@ class MapFragment : Fragment(), LocationListener {
     private lateinit var locationManager: LocationManager
     private var userLocationMarker: Marker? = null
     private lateinit var tvSheetDetails: TextView
+    private lateinit var tvSheetReport: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -68,6 +70,8 @@ class MapFragment : Fragment(), LocationListener {
         viewSheetAqi = view.findViewById(R.id.viewSheetAqi)
         tvSheetAqiNum = view.findViewById(R.id.tvSheetAqiNum)
         tvSheetDetails = view.findViewById(R.id.tvSheetDetails)
+        tvSheetReport = view.findViewById(R.id.tvSheetReport)
+        tvSheetReport.text = ""
 
         // Close bottom sheet on tap outside or on close button
         view.findViewById<View>(R.id.btnCloseSheet).setOnClickListener {
@@ -156,6 +160,7 @@ class MapFragment : Fragment(), LocationListener {
                 viewSheetAqi.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.aqi_unknown)
                 fetchAqiForStation(station)
+                fetchReportsForStation(station.name)
                 bottomSheetStation.visibility = View.VISIBLE
                 true
             }
@@ -200,6 +205,36 @@ class MapFragment : Fragment(), LocationListener {
                     t: Throwable
                 ) {
                     Log.e(TAG, "AQI fetch failed for station ${station.name}: ${t.message}")
+                }
+            })
+    }
+
+    private fun fetchReportsForStation(stationName: String) {
+        tvSheetReport.text = "Loading reports..."
+        val key = stationName.replace(".", "_")
+        FirebaseDatabase.getInstance("https://airbus-quest-default-rtdb.europe-west1.firebasedatabase.app")
+            .reference
+            .child("reports")
+            .child(key)
+            .limitToLast(1) // Show only the latest report
+            .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                    if (!snapshot.exists()) {
+                        tvSheetReport.text = "No community reports yet."
+                        return
+                    }
+                    snapshot.children.lastOrNull()?.let { child ->
+                        val rating = child.child("rating").getValue(Int::class.java) ?: 0
+                        val comment = child.child("comment").getValue(String::class.java) ?: ""
+                        val userId = child.child("userId").getValue(String::class.java) ?: "unknown"
+                        val stars = "★".repeat(rating) + "☆".repeat(5 - rating)
+                        tvSheetReport.text = "$stars \"$comment\" — ${userId.take(8)}"
+                        Log.d(TAG, "Report loaded for $stationName: $rating stars")
+                    }
+                }
+                override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                    tvSheetReport.text = "Could not load reports."
+                    Log.e(TAG, "RTDB error: ${error.message}")
                 }
             })
     }

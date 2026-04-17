@@ -1,6 +1,7 @@
 package com.example.airbus_quest
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -129,7 +130,12 @@ class ReportFragment : Fragment() {
             val rating = ratingBar.rating.toInt()
             Log.d(TAG, "Submit clicked — station='$stationName', rating=$rating")
             val comment = etComment.text.toString().trim()
-            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+            val firebaseUser = FirebaseAuth.getInstance().currentUser
+            val userId = firebaseUser?.displayName?.ifBlank { null }
+                ?: requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                    .getString("userIdentifier", null)
+                ?: firebaseUser?.email?.substringBefore("@")
+                ?: "anonymous"
 
             if (stationName.isBlank()) {
                 Toast.makeText(requireContext(), "Please select a station", Toast.LENGTH_SHORT).show()

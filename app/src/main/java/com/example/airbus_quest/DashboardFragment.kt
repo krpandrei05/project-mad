@@ -49,6 +49,7 @@ class DashboardFragment : Fragment(), LocationListener {
     private lateinit var tvNoAlerts: TextView
     private val recommendations = mutableListOf<RecommendationItem>()
     private lateinit var recommendationAdapter: RecommendationAdapter
+    private lateinit var ivAvatar: ImageView
 
     private val locationPermissionCode = 2
 
@@ -78,6 +79,8 @@ class DashboardFragment : Fragment(), LocationListener {
         viewHpFill = view.findViewById(R.id.viewHpFill)
         rvRecommendations = view.findViewById(R.id.rvRecommendations)
         tvNoAlerts = view.findViewById(R.id.tvNoAlerts)
+        ivAvatar = view.findViewById(R.id.ivAvatar)
+
         recommendationAdapter = RecommendationAdapter(requireContext(), recommendations)
         rvRecommendations.layoutManager =
             androidx.recyclerview.widget.LinearLayoutManager(requireContext())
@@ -232,6 +235,13 @@ class DashboardFragment : Fragment(), LocationListener {
             withContext(Dispatchers.Main) {
                 character?.let {
                     tvNickname.text = it.nickname
+                    val iconRes = when (it.avatarType) {
+                        "commuter"   -> android.R.drawable.ic_menu_directions
+                        "cyclist"    -> android.R.drawable.ic_menu_compass
+                        "pedestrian" -> android.R.drawable.ic_menu_myplaces
+                        else         -> android.R.drawable.ic_menu_myplaces
+                    }
+                    ivAvatar.setImageResource(iconRes)
                     updateHpUI(it.hp)
                     tvStats.text = getString(R.string.day_stations_format, it.dayCount, it.stationsVisited)
                     Log.d(TAG, "Active character loaded: ${it.nickname} (id=${it.id})")

@@ -37,6 +37,7 @@ class HistoryFragment : Fragment() {
     private lateinit var tvSelectedCharacterName: TextView
     private lateinit var lvCoordinates: ListView
     private lateinit var tvNoCoordinates: TextView
+    private var currentSelectedCharacter: GameCharacter? = null
     private val viewModel: HistoryViewModel by viewModels()
 
     override fun onCreateView(
@@ -91,6 +92,7 @@ class HistoryFragment : Fragment() {
 
     // Reveal the coordinates section and populate it with CSV data for the selected character.
     private fun showCoordinatesForCharacter(character: GameCharacter) {
+        currentSelectedCharacter = character
         layoutCoordinates.visibility = View.VISIBLE
         tvSelectedCharacterName.text = "📍 GPS History — ${character.nickname}"
 
@@ -138,6 +140,13 @@ class HistoryFragment : Fragment() {
         } catch (e: IOException) {
             Log.e(TAG, "Error reading CSV for character $characterId: ${e.message}")
             emptyList()
+        }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden && layoutCoordinates.visibility == View.VISIBLE) {
+            currentSelectedCharacter?.let { showCoordinatesForCharacter(it) }
         }
     }
 
@@ -203,11 +212,25 @@ class HistoryFragment : Fragment() {
             if (character.isAlive) {
                 btnSelectCharacter.visibility = View.VISIBLE
                 btnSelectCharacter.setOnClickListener {
+                    // 1. Save active character
                     val prefs = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
                     prefs.edit().putInt("activeCharacterId", character.id).apply()
                     Log.d(TAG, "Active character set: id=${character.id}, name=${character.nickname}")
+
+                    // 2. Toast
                     Toast.makeText(context, "${character.nickname} is now active!", Toast.LENGTH_SHORT).show()
+
+                    // 3. Refresh the character list visually
                     notifyDataSetChanged()
+
+                    // 4. Tell DashboardFragment to reload
+                    requireActivity().supportFragmentManager.fragments
+                        .filterIsInstance<DashboardFragment>()
+                        .firstOrNull()
+                        ?.loadActiveCharacter(saveLocation = true)
+
+                    // 5. Navigate to Dashboard
+                    (requireActivity() as MainActivity).navigateToDashboard()
                 }
             } else {
                 btnSelectCharacter.visibility = View.GONE

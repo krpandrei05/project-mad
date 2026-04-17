@@ -50,6 +50,7 @@ class DashboardFragment : Fragment(), LocationListener {
     private val recommendations = mutableListOf<RecommendationItem>()
     private lateinit var recommendationAdapter: RecommendationAdapter
     private lateinit var ivAvatar: ImageView
+    private var lastLocation: Location? = null
 
     private val locationPermissionCode = 2
 
@@ -175,6 +176,7 @@ class DashboardFragment : Fragment(), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
+        lastLocation = location
         val timestamp = System.currentTimeMillis()
 
         val lat = "%.4f".format(location.latitude)
@@ -221,7 +223,7 @@ class DashboardFragment : Fragment(), LocationListener {
         Log.d(TAG, "CSV saved: $timestamp;$formattedLat;$formattedLong;$formattedAlt")
     }
 
-    private fun loadActiveCharacter() {
+    internal fun loadActiveCharacter(saveLocation: Boolean = false) {
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(requireContext())
             val prefs = requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
@@ -236,6 +238,11 @@ class DashboardFragment : Fragment(), LocationListener {
 
             withContext(Dispatchers.Main) {
                 character?.let {
+                    if (saveLocation) {
+                        lastLocation?.let { loc ->
+                            saveCoordinatesToFile(loc.latitude, loc.longitude, loc.altitude, System.currentTimeMillis())
+                        }
+                    }
                     tvNickname.text = it.nickname
                     val iconRes = when (it.avatarType) {
                         "commuter"   -> android.R.drawable.ic_menu_directions

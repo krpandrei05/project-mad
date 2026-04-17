@@ -151,6 +151,10 @@ class MainActivity : AppCompatActivity() {
         toolbar.title = title
     }
 
+    fun navigateToDashboard() {
+        bottomNav.selectedItemId = R.id.nav_dashboard
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)

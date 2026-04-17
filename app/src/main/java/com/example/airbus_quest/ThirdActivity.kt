@@ -36,7 +36,6 @@ class ThirdActivity : AppCompatActivity() {
 
         Log.d(ThirdTag, "Received: ts=$timestamp, lat=$latitude, lon=$longitude, alt=$altitude")
 
-        // Utilizatorul poate vedea datele clar.
         val etTimestamp: EditText = findViewById(R.id.etTimestamp)
         val etLatitude:  EditText = findViewById(R.id.etLatitude)
         val etLongitude: EditText = findViewById(R.id.etLongitude)

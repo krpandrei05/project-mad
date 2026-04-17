@@ -276,7 +276,8 @@ class DashboardFragment : Fragment(), LocationListener {
                         name = stop.stopName,
                         latitude = stop.geometry.coordinates[1],
                         longitude = stop.geometry.coordinates[0],
-                        busLine = stop.lines?.firstOrNull()?.label ?: "EMT"
+                        busLine = stop.lines?.firstOrNull()?.label ?: "EMT",
+                        allLines = stop.lines?.joinToString(", ") { it.label } ?: ""
                     )
                 }
                 db.stationDao().insertAll(stations)

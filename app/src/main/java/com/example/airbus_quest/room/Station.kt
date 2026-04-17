@@ -11,5 +11,6 @@ data class Station(
     val latitude: Double,
     val longitude: Double,
     val busLine: String,
+    val allLines: String = "",
     val lastAqi: Int = -1
 )

@@ -25,6 +25,11 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import androidx.lifecycle.lifecycleScope
+import com.example.airbus_quest.api.RetrofitClient
+import com.example.airbus_quest.room.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MapFragment : Fragment(), LocationListener {
 
@@ -38,6 +43,7 @@ class MapFragment : Fragment(), LocationListener {
     private lateinit var tvSheetAqiNum: TextView
     private lateinit var locationManager: LocationManager
     private var userLocationMarker: Marker? = null
+    private lateinit var tvSheetDetails: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -61,6 +67,7 @@ class MapFragment : Fragment(), LocationListener {
         tvStationName = view.findViewById(R.id.tvStationName)
         viewSheetAqi = view.findViewById(R.id.viewSheetAqi)
         tvSheetAqiNum = view.findViewById(R.id.tvSheetAqiNum)
+        tvSheetDetails = view.findViewById(R.id.tvSheetDetails)
 
         // Close bottom sheet on tap outside or on close button
         view.findViewById<View>(R.id.btnCloseSheet).setOnClickListener {
@@ -143,15 +150,12 @@ class MapFragment : Fragment(), LocationListener {
 
             marker.setOnMarkerClickListener { _, _ ->
                 tvStationName.text = station.name
-                val aqi = if (station.lastAqi == -1) "?" else station.lastAqi.toString()
-                tvSheetAqiNum.text = aqi
-                if (station.lastAqi != -1) {
-                    viewSheetAqi.backgroundTintList =
-                        ContextCompat.getColorStateList(requireContext(), colorRes)
-                } else {
-                    viewSheetAqi.backgroundTintList =
-                        ContextCompat.getColorStateList(requireContext(), R.color.aqi_unknown)
-                }
+                val lines = station.allLines.ifBlank { station.busLine }
+                tvSheetDetails.text = if (lines.isNotBlank()) "Lines: $lines" else ""
+                tvSheetAqiNum.text = "..."
+                viewSheetAqi.backgroundTintList =
+                    ContextCompat.getColorStateList(requireContext(), R.color.aqi_unknown)
+                fetchAqiForStation(station)
                 bottomSheetStation.visibility = View.VISIBLE
                 true
             }
@@ -159,6 +163,45 @@ class MapFragment : Fragment(), LocationListener {
             map.overlays.add(marker)
         }
         Log.d(TAG, "Added ${stations.size} station markers to map")
+    }
+
+    private fun fetchAqiForStation(station: Station) {
+        val prefs = requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val apiKey = prefs.getString("API_KEY", "4f4354bbc1ef7c530c57dbf3a0bbb5ea")
+            ?: "4f4354bbc1ef7c530c57dbf3a0bbb5ea"
+
+        RetrofitClient.openWeatherService
+            .getAirPollution(station.latitude, station.longitude, apiKey)
+            .enqueue(object : retrofit2.Callback<com.example.airbus_quest.api.AirPollutionResponse> {
+                override fun onResponse(
+                    call: retrofit2.Call<com.example.airbus_quest.api.AirPollutionResponse>,
+                    response: retrofit2.Response<com.example.airbus_quest.api.AirPollutionResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val aqiValue = response.body()?.list?.firstOrNull()?.main?.aqi ?: return
+                        tvSheetAqiNum.text = aqiValue.toString()
+                        val colorRes = when (aqiValue) {
+                            1 -> R.color.aqi_good
+                            2, 3 -> R.color.aqi_moderate
+                            4 -> R.color.aqi_unhealthy
+                            else -> R.color.aqi_hazardous
+                        }
+                        viewSheetAqi.backgroundTintList =
+                            ContextCompat.getColorStateList(requireContext(), colorRes)
+                        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                            AppDatabase.getDatabase(requireContext())
+                                .stationDao().updateAqi(station.id, aqiValue)
+                        }
+                    }
+                }
+
+                override fun onFailure(
+                    call: retrofit2.Call<com.example.airbus_quest.api.AirPollutionResponse>,
+                    t: Throwable
+                ) {
+                    Log.e(TAG, "AQI fetch failed for station ${station.name}: ${t.message}")
+                }
+            })
     }
 
     override fun onResume() {

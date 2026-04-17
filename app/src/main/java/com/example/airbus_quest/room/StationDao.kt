@@ -25,4 +25,7 @@ interface StationDao {
 
     @Query("DELETE FROM STATIONS")
     suspend fun deleteAll()
+
+    @Query("UPDATE STATIONS SET lastAqi = :aqi WHERE id = :stationId")
+    suspend fun updateAqi(stationId: Int, aqi: Int)
 }

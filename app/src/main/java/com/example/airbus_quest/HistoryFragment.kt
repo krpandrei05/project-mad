@@ -94,7 +94,7 @@ class HistoryFragment : Fragment() {
         layoutCoordinates.visibility = View.VISIBLE
         tvSelectedCharacterName.text = "📍 GPS History — ${character.nickname}"
 
-        val lines = readFileLines()
+        val lines = readFileLines(character.id)
 
         if (lines.isEmpty()) {
             lvCoordinates.visibility = View.GONE
@@ -131,12 +131,12 @@ class HistoryFragment : Fragment() {
 
     // Read all lines from the gps_coordinates.csv file stored in internal storage.
     // Return an empty list if the file does not exist yet.
-    private fun readFileLines(): List<String> {
-        val fileName = "gps_coordinates.csv"
+    private fun readFileLines(characterId: Int): List<String> {
+        val fileName = "gps_coordinates_$characterId.csv"
         return try {
             requireContext().openFileInput(fileName).bufferedReader().readLines()
         } catch (e: IOException) {
-            Log.e(TAG, "Error reading CSV: ${e.message}")
+            Log.e(TAG, "Error reading CSV for character $characterId: ${e.message}")
             emptyList()
         }
     }

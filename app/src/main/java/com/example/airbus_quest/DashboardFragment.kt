@@ -208,7 +208,9 @@ class DashboardFragment : Fragment(), LocationListener {
     }
 
     private fun saveCoordinatesToFile(latitude: Double, longitude: Double, altitude: Double, timestamp: Long) {
-        val fileName = "gps_coordinates.csv"
+        val prefs = requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val characterId = prefs.getInt("activeCharacterId", -1)
+        val fileName = if (characterId != -1) "gps_coordinates_$characterId.csv" else "gps_coordinates.csv"
         val file = File(requireContext().filesDir, fileName)
 
         val formattedLat = "%.4f".format(latitude)

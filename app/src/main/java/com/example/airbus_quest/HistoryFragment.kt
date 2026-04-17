@@ -8,10 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -195,6 +197,20 @@ class HistoryFragment : Fragment() {
                     context, R.drawable.bg_badge_dead
                 )
                 view.alpha = 0.7f
+            }
+            val btnSelectCharacter: Button = view.findViewById(R.id.btnSelectCharacter)
+
+            if (character.isAlive) {
+                btnSelectCharacter.visibility = View.VISIBLE
+                btnSelectCharacter.setOnClickListener {
+                    val prefs = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                    prefs.edit().putInt("activeCharacterId", character.id).apply()
+                    Log.d(TAG, "Active character set: id=${character.id}, name=${character.nickname}")
+                    Toast.makeText(context, "${character.nickname} is now active!", Toast.LENGTH_SHORT).show()
+                    notifyDataSetChanged()
+                }
+            } else {
+                btnSelectCharacter.visibility = View.GONE
             }
 
             return view

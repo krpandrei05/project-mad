@@ -105,6 +105,13 @@ class DashboardFragment : Fragment(), LocationListener {
         }
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            loadActiveCharacter()
+        }
+    }
+
     // Observe each LiveData field and update the UI when it changes
     private fun observeViewModel() {
         viewModel.locationText.observe(viewLifecycleOwner) { tvLocation.text = it }
@@ -212,16 +219,22 @@ class DashboardFragment : Fragment(), LocationListener {
     private fun loadActiveCharacter() {
         lifecycleScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getDatabase(requireContext())
-            val character = db.characterDao().getActiveCharacter()
+            val prefs = requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+            val activeId = prefs.getInt("activeCharacterId", -1)
+
+            // Use saved active ID if present, otherwise fall back to first alive character
+            val character = if (activeId != -1) {
+                db.characterDao().getById(activeId)
+            } else {
+                db.characterDao().getActiveCharacter()
+            }
+
             withContext(Dispatchers.Main) {
                 character?.let {
                     tvNickname.text = it.nickname
                     updateHpUI(it.hp)
-                    tvStats.text = getString(
-                        R.string.day_stations_format,
-                        it.dayCount,
-                        it.stationsVisited
-                    )
+                    tvStats.text = getString(R.string.day_stations_format, it.dayCount, it.stationsVisited)
+                    Log.d(TAG, "Active character loaded: ${it.nickname} (id=${it.id})")
                 }
             }
         }
@@ -250,6 +263,9 @@ class DashboardFragment : Fragment(), LocationListener {
 
     private fun fetchNearbyEmtStops(lat: Double, lon: Double) {
         val radius = 500
+        // val radius = requireActivity()
+        //    .getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        //    .getInt("detectionRadius", 500)
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {

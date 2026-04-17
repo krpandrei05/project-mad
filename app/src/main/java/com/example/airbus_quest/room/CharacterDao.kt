@@ -12,7 +12,8 @@ interface CharacterDao {
     suspend fun getActiveCharacter(): GameCharacter?
     @Update
     suspend fun update(character: GameCharacter)
-
     @Delete
     suspend fun delete(character: GameCharacter)
+    @Query("SELECT * FROM CHARACTERS WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Int): GameCharacter?
 }

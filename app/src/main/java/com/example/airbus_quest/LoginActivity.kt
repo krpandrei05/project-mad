@@ -20,7 +20,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         // If already logged in, skip to MainActivity
         val currentUser = FirebaseAuth.getInstance().currentUser

@@ -193,8 +193,7 @@ class DashboardFragment : Fragment(), LocationListener {
         // Delegate the API calls to the ViewModel
         viewModel.fetchWeatherData(location.latitude, location.longitude)
 
-        // TODO: remove hardcoded coordinates
-        fetchNearbyEmtStops(40.4168, -3.7038)
+        fetchNearbyEmtStops(location.latitude, location.longitude)
 
         // Run game logic for nearby stations
         val lastAqi = viewModel.aqi.value ?: 1

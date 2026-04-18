@@ -75,8 +75,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.1.1")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
-    apply(plugin = "com.google.gms.google-services")
 
     // Firebase Realtime Database
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
 }
+
+apply(plugin = "com.google.gms.google-services")

@@ -211,6 +211,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun navigateToReportWithStation(stationName: String) {
+        bottomNav.selectedItemId = R.id.nav_report
+        // Pass station name to ReportFragment
+        val prefs = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        prefs.edit().putString("preselectedStation", stationName).apply()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)

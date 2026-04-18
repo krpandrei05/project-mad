@@ -31,6 +31,7 @@ import com.example.airbus_quest.room.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.google.firebase.database.FirebaseDatabase
+import org.osmdroid.views.overlay.Polyline
 
 class MapFragment : Fragment(), LocationListener {
 
@@ -46,6 +47,7 @@ class MapFragment : Fragment(), LocationListener {
     private var userLocationMarker: Marker? = null
     private lateinit var tvSheetDetails: TextView
     private lateinit var tvSheetReport: TextView
+    private var routePolyline: org.osmdroid.views.overlay.Polyline? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -76,6 +78,9 @@ class MapFragment : Fragment(), LocationListener {
         // Close bottom sheet on tap outside or on close button
         view.findViewById<View>(R.id.btnCloseSheet).setOnClickListener {
             bottomSheetStation.visibility = View.GONE
+            routePolyline?.let { map.overlays.remove(it) }
+            routePolyline = null
+            map.invalidate()
         }
 
         // FAB centers map on user's last known location
@@ -154,13 +159,46 @@ class MapFragment : Fragment(), LocationListener {
 
             marker.setOnMarkerClickListener { _, _ ->
                 tvStationName.text = station.name
+
                 val lines = station.allLines.ifBlank { station.busLine }
-                tvSheetDetails.text = if (lines.isNotBlank()) "Lines: $lines" else ""
+
+                // Calculate distance from user to station
+                val distanceText = userLocationMarker?.position?.let { userPos ->
+                    val results = FloatArray(1)
+                    android.location.Location.distanceBetween(
+                        userPos.latitude, userPos.longitude,
+                        station.latitude, station.longitude,
+                        results
+                    )
+                    val distMeters = results[0].toInt()
+                    if (distMeters < 1000) "${distMeters}m away" else "${"%.1f".format(distMeters / 1000f)}km away"
+                } ?: "Location unavailable"
+
+                tvSheetDetails.text = buildString {
+                    if (lines.isNotBlank()) append("Lines: $lines\n")
+                    append(distanceText)
+                }
                 tvSheetAqiNum.text = "..."
                 viewSheetAqi.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.aqi_unknown)
                 fetchAqiForStation(station)
                 fetchReportsForStation(station.name)
+
+                // Draw route from user to station
+                routePolyline?.let { map.overlays.remove(it) }
+                routePolyline = null
+                map.invalidate()
+                userLocationMarker?.position?.let { userPos ->
+                    fetchRoute(userPos.latitude, userPos.longitude, station.latitude, station.longitude)
+                }
+
+                // btnReportStation navigates to Report tab with station pre-selected
+                view?.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnReportStation)
+                    ?.setOnClickListener {
+                        (requireActivity() as MainActivity).navigateToReportWithStation(station.name)
+                        bottomSheetStation.visibility = View.GONE
+                    }
+
                 bottomSheetStation.visibility = View.VISIBLE
                 true
             }
@@ -235,6 +273,35 @@ class MapFragment : Fragment(), LocationListener {
                 override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
                     tvSheetReport.text = "Could not load reports."
                     Log.e(TAG, "RTDB error: ${error.message}")
+                }
+            })
+    }
+
+    private fun fetchRoute(startLat: Double, startLon: Double, endLat: Double, endLon: Double) {
+        RetrofitClient.osrmService.getRoute(startLon, startLat, endLon, endLat)
+            .enqueue(object : retrofit2.Callback<com.example.airbus_quest.api.OsrmResponse> {
+                override fun onResponse(
+                    call: retrofit2.Call<com.example.airbus_quest.api.OsrmResponse>,
+                    response: retrofit2.Response<com.example.airbus_quest.api.OsrmResponse>
+                ) {
+                    val coords = response.body()?.routes?.firstOrNull()?.geometry?.coordinates
+                    if (coords != null) {
+                        val points = coords.map { GeoPoint(it[1], it[0]) } // OSRM returns [lon, lat]
+                        val polyline = Polyline()
+                        polyline.setPoints(points)
+                        polyline.color = ContextCompat.getColor(requireContext(), R.color.accent)
+                        polyline.width = 5f
+                        map.overlays.add(polyline)
+                        routePolyline = polyline
+                        map.invalidate()
+                        Log.d(TAG, "Route drawn with ${points.size} points")
+                    }
+                }
+                override fun onFailure(
+                    call: retrofit2.Call<com.example.airbus_quest.api.OsrmResponse>,
+                    t: Throwable
+                ) {
+                    Log.e(TAG, "OSRM route failed: ${t.message}")
                 }
             })
     }

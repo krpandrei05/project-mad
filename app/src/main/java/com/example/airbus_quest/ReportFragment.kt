@@ -97,6 +97,7 @@ class ReportFragment : Fragment() {
                 )
                 actvStation.setAdapter(adapter)
                 actvStation.setOnClickListener { actvStation.showDropDown() }
+
                 tvNearestStation.text = "Nearest station: ${stationNames.first()}"
                 Log.d(TAG, "Loaded ${stationNames.size} stations")
             }
@@ -182,5 +183,19 @@ class ReportFragment : Fragment() {
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         pickPhotoLauncher.launch(intent)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            val preselected = requireContext()
+                .getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                .getString("preselectedStation", null)
+            if (!preselected.isNullOrBlank()) {
+                view?.findViewById<AutoCompleteTextView>(R.id.actvStation)?.setText(preselected)
+                requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                    .edit().remove("preselectedStation").apply()
+            }
+        }
     }
 }

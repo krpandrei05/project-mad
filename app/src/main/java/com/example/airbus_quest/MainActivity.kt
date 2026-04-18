@@ -19,6 +19,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
@@ -39,7 +41,10 @@ class MainActivity : AppCompatActivity() {
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == "userIdentifier") {
             val username = prefs.getString("userIdentifier", "Username") ?: "Username"
-            tvDrawerUsername.text = username
+            val firebaseUser = FirebaseAuth.getInstance().currentUser
+            tvDrawerUsername.text = firebaseUser?.displayName?.ifBlank { null }
+                ?: firebaseUser?.email?.substringBefore("@")
+                        ?: username
             Log.d(TAG, "Username updated in drawer: $username")
         }
     }
@@ -85,6 +90,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.drawer_logout -> {
                     Log.d(TAG, "Drawer: Logout clicked")
+                    AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener {
+                            Log.d(TAG, "Signed out successfully")
+                            val intent = Intent(this, LoginActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            finish()
+                        }
                 }
             }
             drawerLayout.closeDrawers()
@@ -96,8 +110,11 @@ class MainActivity : AppCompatActivity() {
 
         // Bind the drawer header username TextView
         tvDrawerUsername = navView.getHeaderView(0).findViewById(R.id.tvDrawerUsername)
-        tvDrawerUsername.text = prefs.getString("userIdentifier", "Username") ?: "Username"
-
+        val firebaseUser = FirebaseAuth.getInstance().currentUser
+        tvDrawerUsername.text = firebaseUser?.displayName?.ifBlank { null }
+            ?: firebaseUser?.email?.substringBefore("@")
+                    ?: prefs.getString("userIdentifier", "Username")
+                    ?: "Username"
         // 3. Bottom Nav Config
         bottomNav = findViewById(R.id.bottomNav)
 

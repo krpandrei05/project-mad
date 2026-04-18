@@ -35,7 +35,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun launchSignInFlow() {
         val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.EmailBuilder()
+                .build(),
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
         startActivityForResult(
@@ -44,6 +45,7 @@ class LoginActivity : AppCompatActivity() {
                 .setAvailableProviders(providers)
                 .setTheme(R.style.Theme_AirBusQuest)
                 .setLogo(R.mipmap.ic_launcher)
+                .setIsSmartLockEnabled(false)
                 .build(),
             RC_SIGN_IN
         )

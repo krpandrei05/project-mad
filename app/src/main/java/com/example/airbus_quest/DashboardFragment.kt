@@ -254,6 +254,7 @@ class DashboardFragment : Fragment(), LocationListener {
                     updateHpUI(it.hp)
                     tvStats.text = getString(R.string.day_stations_format, it.dayCount, it.stationsVisited)
                     Log.d(TAG, "Active character loaded: ${it.nickname} (id=${it.id})")
+                    (requireActivity() as? MainActivity)?.updateDrawerCharacter()
                 }
             }
         }
